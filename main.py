@@ -9,11 +9,11 @@ app = FastAPI()
 model.Base.metadata.create_all(bind=engine)
 
 class choiceBased(BaseModel):
-    Choice_text : str
-    Is_correct : bool
+    choice_text : str
+    is_correct : bool
 
 class questionBased(BaseModel):
-    Question_text : str
+    question_text : str
     choices : List[choiceBased]
 
 def get_db():
@@ -26,15 +26,19 @@ def get_db():
 db_dependency = Annotated[Session, Depends(get_db)]
 
 @app.get("/questions/{question_id}")
-async def read_question(question_id: int, db = db_dependency):
+async def read_question(question_id: int, db: db_dependency):
     result = db.query(model.Questions).filter(model.Questions.id == question_id).first()
     if not result:
         raise HTTPException(status_code=404, detail="question is not found")
     return result
 
 @app.get("/choices/{question_id}")
-async def read_question(question_id: int, db = db_dependency):
-    result = db.query(model.Questions).filter(model.Choices.id == question_id).all()
+async def read_choices(question_id: int, db: db_dependency):
+    result = (
+        db.query(model.Choices)
+        .filter(model.Choices.question_id == question_id)
+        .all()
+    )
     if not result:
         raise HTTPException(status_code=404, detail="choices are not found")
     return result
