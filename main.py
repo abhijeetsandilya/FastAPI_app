@@ -32,7 +32,7 @@ async def read_question(question_id: int, db = db_dependency):
         raise HTTPException(status_code=404, detail="question is not found")
     return result
 
-@app.get("/questions/{question_id}")
+@app.get("/choices/{question_id}")
 async def read_question(question_id: int, db = db_dependency):
     result = db.query(model.Questions).filter(model.Choices.id == question_id).all()
     if not result:
